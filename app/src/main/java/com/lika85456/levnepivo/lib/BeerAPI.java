@@ -1,102 +1,92 @@
 package com.lika85456.levnepivo.lib;
 
+import androidx.annotation.NonNull;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class BeerAPI {
-    private static String apiUrl = "https://www.kupi.cz/slevy/pivo#sgc=pivo";
+    private static final String apiUrl = "https://www.kupi.cz/slevy/pivo#sgc=pivo";
 
-    public static ArrayList<BeerDiscount> fetchDiscounts() throws IOException {
-        //Connect to website
+    public static ArrayList<BeerDiscount> fetchDiscounts() throws IOException, NullPointerException{
+        Elements fetchedElements = fetchDiscountElements();
+
+        // parse HTML elements to custom discount structure
+        ArrayList<BeerDiscount> beerElements = new ArrayList<>();
+        for(Element fetchedElement: fetchedElements){
+            beerElements.add(parseBeerElement(fetchedElement));
+        }
+
+        return beerElements;
+    }
+
+    /**
+     * @return DOM elements containing discount for each beer with its provider discounts
+     * @throws IOException if internet is not available
+     */
+    private static Elements fetchDiscountElements() throws IOException{
         Document document = Jsoup.connect(BeerAPI.apiUrl).get();
-        Elements discountBlocks = document.getElementsByClass("group_discounts active");
+        return document.getElementsByClass("group_discounts active");
+    }
 
-        ArrayList<BeerDiscount> allDiscounts = new ArrayList();
-        HashMap<String, BeerProvider> providers = new HashMap();
-        HashMap<String, Beer> beers = new HashMap();
+    /**
+     * Parses beer discount from its DOM element to custom structure
+     * @param element DOM element of the discount
+     * @return parsed beer discount
+     */
+    private static BeerDiscount parseBeerElement(@NonNull Element element) throws NullPointerException{
+        BeerDiscount toRet = new BeerDiscount();
 
-        for(Element discountElement: discountBlocks){
-            allDiscounts.addAll(parseDiscount(discountElement, providers, beers));
+        // parse beer
+        toRet.beer.name = element.getElementsByClass("product_link_history").first().getElementsByTag("strong").first().text();
+        toRet.beer.imageUrl = element.getElementsByClass("product_image").first().getElementsByTag("img").first().attr("data-src");
+
+        // parse provider discounts
+        Elements discounts = element.getElementsByClass("discount_row");
+        toRet.discounts = new ArrayList<>();
+        for(Element discountElement : discounts){
+            BeerProviderDiscount discount = new BeerProviderDiscount();
+            discount.providerName = discountElement.getElementsByTag("span").first().text();
+            discount.providerImageUrl = discountElement.getElementsByTag("img").first().attr("src");
+            discount.validTo = discountElement.getElementsByClass("discounts_validity").first().text();
+            discount.pricePerVolume = discountElement.getElementsByClass("discounts_price").first().text();
+            // keep just price per volume without the discounted %
+            discount.pricePerVolume = discount.pricePerVolume.split("l")[0] + "l";
+            toRet.discounts.add(discount);
         }
 
-        System.out.println(discountBlocks.get(0).getElementsByTag("strong").get(0).text());
-        //get(0).getElementsByClass("strong").get(0).text()
-
-        return allDiscounts;
+        return toRet;
     }
 
-    private static Beer parseBeer(Element beerElement){
-        Beer beer = new Beer();
-
-        beer.name = beerElement.getElementsByTag("strong").get(0).text();
-        beer.imageUrl = beerElement.getElementsByClass("product_image").get(0).getElementsByTag("img").attr("src");
-
-        return beer;
-    }
-
-    private static ArrayList<BeerDiscount> parseDiscount(Element discountElement, HashMap<String, BeerProvider> providers, HashMap<String, Beer> beers) {
-        ArrayList<BeerDiscount> discounts = new ArrayList();
-
-        // check beer existance
-        String beerName = discountElement.getElementsByTag("strong").get(0).text();
-        Beer beer = beers.get(beerName);
-        if(beer==null){
-            beer = parseBeer(discountElement);
-            beers.put(beerName, beer);
-        }
-
-        BeerDiscount b = new BeerDiscount();
-        b.beer = beer;
-        discounts.add(b);
-        return discounts;
-    }
-
-    public class BeerProvider {
-        String name;
-        String imageUrl;
-
-        @Override
-        public String toString() {
-            return "BeerProvider{" +
-                    "name='" + name + '\'' +
-                    ", imageUrl='" + imageUrl + '\'' +
-                    '}';
-        }
-    }
-
-    public static class Beer {
-        String name;
-        String imageUrl;
-
-        @Override
-        public String toString() {
-            return "Beer{" +
-                    "name='" + name + '\'' +
-                    ", imageUrl='" + imageUrl + '\'' +
-                    '}';
-        }
-    }
-
+    /**
+     * Contains beer definition and it's discounts from different providers
+     */
     public static class BeerDiscount {
-        Beer beer;
-        BeerProvider provider;
-        String pricePerVolume; // why parse
+        // beer
+        public Beer beer;
+        public ArrayList<BeerProviderDiscount> discounts;
 
-        @Override
-        public String toString() {
-            return "BeerDiscount{" +
-                    "beer=" + beer +
-                    ", provider=" + provider +
-                    ", pricePerVolume='" + pricePerVolume + '\'' +
-                    '}';
+        public BeerDiscount(){
+            beer = new Beer();
+            discounts = new ArrayList<>();
         }
     }
+
+    public static class BeerProviderDiscount {
+        public String providerName;
+        public String providerImageUrl;
+        public String pricePerVolume;
+        public String validTo;
+    }
+    public static class Beer {
+        public String name;
+        public String imageUrl;
+    }
+
+
 }

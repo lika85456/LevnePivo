@@ -1,5 +1,7 @@
 package com.lika85456.levnepivo.lib;
 
+import android.os.AsyncTask;
+
 import androidx.annotation.NonNull;
 
 import org.jsoup.Jsoup;
@@ -23,6 +25,36 @@ public class BeerAPI {
         }
 
         return beerElements;
+    }
+
+    public static AsyncTask<Void, Void, ArrayList<BeerDiscount>> FetchDiscountsTask(@NonNull OnBeerLoaded onBeerLoaded, @NonNull OnBeerLoadFailed onBeerLoadFailed){
+        return new AsyncTask<Void, Void, ArrayList<BeerDiscount>>() {
+            @Override
+            protected ArrayList<BeerDiscount> doInBackground(Void... voids) {
+                try {
+                    return fetchDiscounts();
+                } catch (IOException e) {
+                    onBeerLoadFailed.onBeerLoadFailed(e);
+                } catch (NullPointerException e){
+                    onBeerLoadFailed.onBeerLoadFailed(e);
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(ArrayList<BeerDiscount> beerDiscounts) {
+                super.onPostExecute(beerDiscounts);
+                onBeerLoaded.onBeerLoaded(beerDiscounts);
+            }
+        };
+    }
+
+    public interface OnBeerLoaded{
+        void onBeerLoaded(ArrayList<BeerDiscount> result);
+    }
+
+    public interface OnBeerLoadFailed{
+        void onBeerLoadFailed(Exception exception);
     }
 
     /**

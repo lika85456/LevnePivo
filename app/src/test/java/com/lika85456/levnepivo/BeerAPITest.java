@@ -23,7 +23,7 @@ public class BeerAPITest {
     @Test
     public void itFetchesSensibleData() throws IOException, NullPointerException {
             ArrayList<BeerAPI.BeerDiscount> discounts = BeerAPI.fetchDiscounts();
-
+            assert(discounts.size() > 0);
             for(BeerAPI.BeerDiscount discount : discounts){
                 // check all names contain pivo
                 assert(discount.beer.name.contains("Pivo"));

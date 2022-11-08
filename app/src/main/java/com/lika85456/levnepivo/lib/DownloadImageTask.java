@@ -14,17 +14,18 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         this.bmImage = bmImage;
     }
 
+    // @see https://stackoverflow.com/questions/13486758/android-bitmap-from-url-always-null
     protected Bitmap doInBackground(String... urls) {
-        String urldisplay = urls[0];
-        Bitmap bmp = null;
+        String url = urls[0];
+        Bitmap bitmap = null;
         try {
-            InputStream in = new java.net.URL(urldisplay).openStream();
-            bmp = BitmapFactory.decodeStream(in);
+            InputStream in = new java.net.URL(url).openStream();
+            bitmap = BitmapFactory.decodeStream(in);
         } catch (Exception e) {
             Log.e("Error", e.getMessage());
             e.printStackTrace();
         }
-        return bmp;
+        return bitmap;
     }
     protected void onPostExecute(Bitmap result) {
         bmImage.setImageBitmap(result);

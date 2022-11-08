@@ -1,31 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_margin="10dp"
-    android:layout_marginBottom="0dp"
-    android:elevation="5dp"
+    android:layout_height="wrap_content"
+    card_view:cardBackgroundColor="@color/white"
+    card_view:cardCornerRadius="4dp"
+    android:layout_marginBottom="10dp"
     >
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#6531F8"
+        android:orientation="horizontal"
         >
         <ImageView
-            android:layout_width="50sp"
-            android:layout_height="150sp"
+            android:layout_width="76dp"
+            android:layout_height="200dp"
+            android:src="@mipmap/beer_bottle"
+            android:id="@+id/beer_image"
             android:scaleType="centerCrop"
-            android:id="@+id/beer_image"/>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/beer_title"
-        android:text="Pivo"
-        android:layout_weight="0"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="5dp"
-        android:textStyle="bold"
-        android:textSize="17sp"
-        />
+            />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="1">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2">
+                    <TextView
+                        android:id="@+id/beer_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginRight="32dp"
+                        android:layout_weight="0"
+                        android:text="Neznámé pivo"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        />
+                </LinearLayout>
 
+                <ImageView
+                    android:layout_width="62dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/heart_outline"
+                    android:layout_weight="1"
+                    android:layout_marginRight="24dp"
+                    />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_gravity="center"
+                >
+                <ImageView
+                    android:id="@+id/beer_header_discount"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    />
+                <TextView
+                    android:id="@+id/beer_price"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="neznámá cena"
+                    android:textColor="@color/white"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textAlignment="center"
+                    android:layout_marginTop="4dp"
+                    />
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

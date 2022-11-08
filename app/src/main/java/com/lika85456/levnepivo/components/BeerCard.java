@@ -34,6 +34,18 @@ public class BeerCard extends FrameLayout {
         // set image
         ImageView imageView = findViewById(R.id.beer_image);
         new DownloadImageTask(imageView).execute(this.discount.beer.imageUrl);
+
+        // set price
+        TextView priceView = findViewById(R.id.beer_price);
+        String priceText = discount.discounts.get(0).pricePerVolume;
+        // remove "cena" at the beginning of the price
+        priceText = priceText.substring(5);
+        priceView.setText(priceText);
+
+        // set best discount logo "beer_header_discount"
+        ImageView discountView = findViewById(R.id.beer_header_discount);
+        new DownloadImageTask(discountView).execute(this.discount.discounts.get(0).providerImageUrl);
+
         Log.i("BeerCard", "BeerCard: " + this.discount.beer.imageUrl);
 
     }

@@ -27,6 +27,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // set title
+        setTitle("Seznam slev na pivo!");
+
         loadBeers();
     }
 

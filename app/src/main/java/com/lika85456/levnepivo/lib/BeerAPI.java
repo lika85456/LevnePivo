@@ -1,6 +1,7 @@
 package com.lika85456.levnepivo.lib;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -11,7 +12,11 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
+/**
+ * BeerAPI is an API implementation for getting beer discounts from kupi.cz
+ */
 public class BeerAPI {
     private static final String apiUrl = "https://www.kupi.cz/slevy/pivo#sgc=pivo";
 
@@ -68,6 +73,7 @@ public class BeerAPI {
 
     /**
      * Parses beer discount from its DOM element to custom structure
+     * @implNote Provider beer discounts are sorted in ascending order
      * @param element DOM element of the discount
      * @return parsed beer discount
      */
@@ -86,11 +92,24 @@ public class BeerAPI {
             discount.providerName = discountElement.getElementsByTag("span").first().text();
             discount.providerImageUrl = discountElement.getElementsByTag("img").first().attr("src");
             discount.validTo = discountElement.getElementsByClass("discounts_validity").first().text();
-            discount.pricePerVolume = discountElement.getElementsByClass("discounts_price").first().text();
-            // keep just price per volume without the discounted %
-            discount.pricePerVolume = discount.pricePerVolume.split("l")[0] + "l";
+
+            // get price per volume
+            String pricePerVolume = discountElement.getElementsByClass("discounts_price").first().text();
+            // remove discount percentage
+            pricePerVolume = pricePerVolume.split("l")[0] + "l";
+            // remove "cena " prefix
+            pricePerVolume = pricePerVolume.substring(5);
+            discount.pricePerVolume = new PricePerVolume(pricePerVolume);
+
             toRet.discounts.add(discount);
         }
+
+        // sort discounts by price per volume ascending
+        Arrays.sort(toRet.discounts.toArray(), (o1, o2) -> {
+            BeerProviderDiscount discount1 = (BeerProviderDiscount) o1;
+            BeerProviderDiscount discount2 = (BeerProviderDiscount) o2;
+            return Math.round((discount1.pricePerVolume.getPricePerVolume() - discount2.pricePerVolume.getPricePerVolume())*100000);
+        });
 
         return toRet;
     }
@@ -112,7 +131,7 @@ public class BeerAPI {
     public static class BeerProviderDiscount {
         public String providerName;
         public String providerImageUrl;
-        public String pricePerVolume;
+        public PricePerVolume pricePerVolume;
         public String validTo;
     }
     public static class Beer {
@@ -120,5 +139,37 @@ public class BeerAPI {
         public String imageUrl;
     }
 
+    public static class PricePerVolume {
+        public float price; // in czk
+        public float volume; // in liters
+        public float getPricePerVolume(){
+            return price/volume;
+        }
+        public String pricePerVolume;
 
+        public PricePerVolume(String pricePerVolume){
+            this.pricePerVolume = pricePerVolume;
+            // the format of pricePerVolume is the following:
+            // 1,50 Kč / 0.5 l
+            // 124,90 Kč / 6x 2 l
+            // 69,69 Kč / 4x 0.5 l
+
+            // split by "/" to separate price and volume
+            String[] priceAndVolume = pricePerVolume.split("/");
+
+            // parse price
+            String priceString = priceAndVolume[0].split("Kč")[0].trim();
+            price = Float.parseFloat(priceString.replace(",", "."));
+
+            // parse volume and check for multiplier
+            if(priceAndVolume[1].contains("x")){
+                String[] volumeAndMultiplier = priceAndVolume[1].replace(" l", "").split("x");
+                volume = Float.parseFloat(volumeAndMultiplier[1].trim().replace(",", ".")) * Float.parseFloat(volumeAndMultiplier[0].trim());
+            } else {
+                // parse volume
+                String volumeString = priceAndVolume[1].split("l")[0].trim();
+                volume = Float.parseFloat(volumeString.replace(",", "."));
+            }
+        }
+    }
 }

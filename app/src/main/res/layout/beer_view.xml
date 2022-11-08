@@ -9,6 +9,11 @@
     >
     <LinearLayout
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#6531F8"
         android:orientation="horizontal"
@@ -49,6 +54,7 @@
                 </LinearLayout>
 
                 <ImageView
+                    android:id="@+id/beer_heart_icon"
                     android:layout_width="62dp"
                     android:layout_height="48dp"
                     android:src="@drawable/heart_outline"
@@ -81,5 +87,15 @@
                     />
             </LinearLayout>
         </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:id="@+id/beer_discounts_list"
+        >
+    </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

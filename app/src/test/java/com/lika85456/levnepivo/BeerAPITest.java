@@ -44,8 +44,9 @@ public class BeerAPITest {
                     assert(IMG_URL.matcher(providerDiscount.providerImageUrl).matches());
 
                     // price per volume
-                    assert(providerDiscount.pricePerVolume.length()>0);
-                    assert(providerDiscount.pricePerVolume.contains("l") && providerDiscount.pricePerVolume.contains("Kč"));
+                    assert(providerDiscount.pricePerVolume.price > 0 && providerDiscount.pricePerVolume.price < 2000);
+                    assert(providerDiscount.pricePerVolume.volume > 0 && providerDiscount.pricePerVolume.volume < 20);
+                    assert(providerDiscount.pricePerVolume.getPricePerVolume() > 0 && providerDiscount.pricePerVolume.getPricePerVolume() < 100);
 
                     // valid to
                     assert(providerDiscount.validTo.length()>0);

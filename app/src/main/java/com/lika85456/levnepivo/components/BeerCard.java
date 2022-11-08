@@ -29,11 +29,14 @@ public class BeerCard extends FrameLayout {
     private boolean isExpanded = false;
 
     private ImageView heartIcon;
+    private boolean isFavourite = false;
 
-    public BeerCard(Context context, BeerAPI.BeerDiscount discount) {
+    public BeerCard(Context context, BeerAPI.BeerDiscount discount, boolean isFavourite, OnClickListener onFavouriteClickListener) {
         super(context);
         this.discount = discount;
         inflate(getContext(), R.layout.beer_view, this);
+
+        this.isFavourite = isFavourite;
 
         titleTextView = findViewById(R.id.beer_title);
         beerImageView = findViewById(R.id.beer_image);
@@ -61,13 +64,22 @@ public class BeerCard extends FrameLayout {
             }
         });
 
-        // on heart click add beer to favorites
+        // on heart click
         heartIcon.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: add beer to favorites
+                onFavouriteClickListener.onClick(view);
             }
         });
+    }
+
+    public void setFavourite(boolean isFavourite){
+        this.isFavourite = isFavourite;
+        if(isFavourite){
+            heartIcon.setImageResource(R.drawable.heart_filled);
+        }else{
+            heartIcon.setImageResource(R.drawable.heart_outline);
+        }
     }
 
     private void fillDiscounts(BeerAPI.BeerDiscount discount){
@@ -126,6 +138,13 @@ public class BeerCard extends FrameLayout {
 
         // set best discount logo "beer_header_discount"
         new DownloadImageTask(bestProviderImageView).execute(this.discount.discounts.get(0).providerImageUrl);
+
+        // set heart icon depending on isFavourite
+        if(isFavourite) {
+            heartIcon.setImageResource(R.drawable.heart_filled);
+        }else{
+            heartIcon.setImageResource(R.drawable.heart_outline);
+        }
     }
 
     public BeerAPI.BeerDiscount getDiscount() {

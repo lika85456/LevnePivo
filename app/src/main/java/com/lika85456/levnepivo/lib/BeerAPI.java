@@ -5,6 +5,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -122,10 +123,31 @@ public class BeerAPI {
         public Beer beer;
         public ArrayList<BeerProviderDiscount> discounts;
 
-        public BeerDiscount(){
+        public BeerDiscount() {
             beer = new Beer();
             discounts = new ArrayList<>();
         }
+
+        public static BeerDiscount fromString(String json){
+            try {
+                JSONObject jsonObject = new JSONObject(json);
+                BeerDiscount toRet = new BeerDiscount();
+                toRet.beer = Beer.fromString(jsonObject.getString("beer"));
+                toRet.discounts = new ArrayList<>();
+                for(int i = 0; i < jsonObject.getJSONArray("discounts").length(); i++){
+                    toRet.discounts.add(BeerProviderDiscount.fromString(jsonObject.getJSONArray("discounts").getString(i)));
+                }
+                return toRet;
+            } catch (Exception e){
+                Log.e("BeerDiscount", "Error parsing JSON", e);
+            }
+            return null;
+        }
+
+        public String toJSON() {
+            return JSONObject.wrap(this).toString();
+        }
+
     }
 
     public static class BeerProviderDiscount {
@@ -133,10 +155,47 @@ public class BeerAPI {
         public String providerImageUrl;
         public PricePerVolume pricePerVolume;
         public String validTo;
+
+        public static BeerProviderDiscount fromString(String json){
+            try {
+                JSONObject jsonObject = new JSONObject(json);
+                BeerProviderDiscount toRet = new BeerProviderDiscount();
+                toRet.providerName = jsonObject.getString("providerName");
+                toRet.providerImageUrl = jsonObject.getString("providerImageUrl");
+                toRet.pricePerVolume = PricePerVolume.fromString(jsonObject.getString("pricePerVolume"));
+                toRet.validTo = jsonObject.getString("validTo");
+                return toRet;
+            } catch (Exception e){
+                Log.e("BeerProviderDiscount", "Error parsing JSON", e);
+            }
+            return null;
+        }
+
+        public String toJSON() {
+            return JSONObject.wrap(this).toString();
+        }
     }
+
     public static class Beer {
         public String name;
         public String imageUrl;
+
+        public static Beer fromString(String json){
+            try {
+                JSONObject jsonObject = new JSONObject(json);
+                Beer toRet = new Beer();
+                toRet.name = jsonObject.getString("name");
+                toRet.imageUrl = jsonObject.getString("imageUrl");
+                return toRet;
+            } catch (Exception e){
+                Log.e("Beer", "Error parsing JSON", e);
+            }
+            return null;
+        }
+
+        public String toJSON() {
+            return JSONObject.wrap(this).toString();
+        }
     }
 
     public static class PricePerVolume {
@@ -170,6 +229,21 @@ public class BeerAPI {
                 String volumeString = priceAndVolume[1].split("l")[0].trim();
                 volume = Float.parseFloat(volumeString.replace(",", "."));
             }
+        }
+
+        public static PricePerVolume fromString(String json){
+            try {
+                JSONObject jsonObject = new JSONObject(json);
+                PricePerVolume toRet = new PricePerVolume(jsonObject.getString("pricePerVolume"));
+                return toRet;
+            } catch (Exception e){
+                Log.e("PricePerVolume", "Error parsing JSON", e);
+            }
+            return null;
+        }
+
+        public String toJSON() {
+            return JSONObject.wrap(this).toString();
         }
     }
 }

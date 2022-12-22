@@ -1,39 +1,68 @@
 package com.lika85456.levnepivo.services;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
+import android.util.Log;
 
-import androidx.core.app.NotificationCompat;
+import com.lika85456.levnepivo.lib.BeerAPI;
+import com.lika85456.levnepivo.lib.BeerDiscountsStorage;
 
-import com.lika85456.levnepivo.MainActivity;
-import com.lika85456.levnepivo.R;
+import java.util.ArrayList;
 
-/**
- * This class is responsible for checking new beer discounts and showing notifications if there are any.
- */
 public class NewBeerDiscountsService {
+    /**
+     * Will notify if new loved beer discounts are available
+     * @param oldDiscounts
+     * @param newDiscounts
+     * @param lovedBeers names of loved beers
+     */
+    public static String getNewDiscountsNotificationText(ArrayList<BeerAPI.BeerDiscount> oldDiscounts, ArrayList<BeerAPI.BeerDiscount> newDiscounts, ArrayList<String> lovedBeers) {
+        // remove non loved beers from new discounts
+        for (int i = 0; i < newDiscounts.size(); i++) {
+            if (!lovedBeers.contains(newDiscounts.get(i).beer.name)) {
+                newDiscounts.remove(i);
+                i--;
+            }
+        }
 
-    public onAlarm(Context context) {
-        Intent mainActivityIntent = new Intent(context, MainActivity.class);
-        mainActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent mainActivityPendingIntent = PendingIntent.getActivity(context, 0, mainActivityIntent, PendingIntent.FLAG_IMMUTABLE);
+        // remove non loved beers from old discounts
+        for (int i = 0; i < oldDiscounts.size(); i++) {
+            if (!lovedBeers.contains(oldDiscounts.get(i).beer.name)) {
+                oldDiscounts.remove(i);
+                i--;
+            }
+        }
 
+        String notificationText = "";
 
-        // send notifications
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        // send notification on channel "channel_id"
-        Notification notification = new NotificationCompat.Builder(context, "channel_id")
-                .setContentTitle("Seznam slev na pivo!")
-                .setContentText("Zkontrolujte si seznam slev na pivo!")
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setAutoCancel(true)
-                .setContentIntent(mainActivityPendingIntent)
-                .build();
+        for (String beer : lovedBeers) {
+            // get new discount
+            BeerAPI.BeerDiscount newDiscount = null;
+            for (BeerAPI.BeerDiscount discount : newDiscounts) {
+                if (discount.beer.name.equals(beer)) {
+                    newDiscount = discount;
+                    break;
+                }
+            }
 
-        notificationManager.notify((int)System.currentTimeMillis(), notification);
+            // get old discount
+            BeerAPI.BeerDiscount oldDiscount = null;
+            for (BeerAPI.BeerDiscount discount : oldDiscounts) {
+                if (discount.beer.name.equals(beer)) {
+                    oldDiscount = discount;
+                    break;
+                }
+            }
+
+            if (newDiscount != null && (oldDiscount == null || newDiscount.discounts.get(0).pricePerVolume.price != oldDiscount.discounts.get(0).pricePerVolume.price)) {
+                notificationText += beer + " - " + newDiscount.discounts.get(0).pricePerVolume.price + ",- Kč\n";
+            }
+        }
+
+        if (notificationText.equals("")) {
+            return null;
+        }
+
+        return notificationText;
 
     }
+
 }

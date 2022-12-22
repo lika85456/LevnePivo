@@ -1,9 +1,13 @@
 package com.lika85456.levnepivo;
 
+import static com.lika85456.levnepivo.NotificationsBroadcastReceiver.CHANNEL_ID;
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.app.AlarmManager;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -21,7 +25,9 @@ import android.widget.ScrollView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.lika85456.levnepivo.components.BeerCard;
 import com.lika85456.levnepivo.lib.BeerAPI;
+import com.lika85456.levnepivo.lib.BeerDiscountsStorage;
 import com.lika85456.levnepivo.lib.LovedBeersStorage;
+import com.lika85456.levnepivo.services.NewBeerDiscountsService;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -38,7 +44,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        createNotificationChannel();
+
+        try{
+            createNotificationChannel();
+        }
+        catch(Exception e){
+            Log.d("MainActivity", "Error: " + e.getMessage());
+        }
         lovedBeersStorage = new LovedBeersStorage(this);
 
         // set title
@@ -53,16 +65,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "channel_name";
-            String description = "channel_description";
+            CharSequence name = "Nove pivni slevy";
+            String description = "Notifikacni kanal pro nove pivni slevy";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel("channel_id", name, importance);
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
@@ -195,6 +203,9 @@ public class MainActivity extends AppCompatActivity {
 
         initializeSearch();
         initializeScrollRefresh();
+
+        BeerDiscountsStorage beerDiscountsStorage = new BeerDiscountsStorage(this);
+
     }
 
     private void onBeerLoadFailed(Exception exception){

@@ -27,26 +27,28 @@ public class BeerDiscountsStorageTest {
     public void itSavesAndLoadsProperly() {
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         BeerDiscountsStorage storage = new BeerDiscountsStorage(appContext);
-
-        // assert empty
-        assertEquals(0, storage.getBeerDiscounts().size());
+        storage.clear();
 
         ArrayList<BeerAPI.BeerDiscount> beers = new ArrayList<>();
         BeerAPI.BeerDiscount b1 = new BeerAPI.BeerDiscount();
         b1.beer.name = "beer1";
         b1.beer.imageUrl = "https://beer1";
         b1.discounts = new ArrayList<>();
-        beers.add(b1);
 
-        BeerAPI.Beer beer = b1.beer;
+        BeerAPI.BeerProviderDiscount d1 = new BeerAPI.BeerProviderDiscount();
+        d1.pricePerVolume = new BeerAPI.PricePerVolume("10,0 Kč / 0.5 l");
+
+        b1.discounts.add(d1);
+
+        beers.add(b1);
 
         storage.setBeerDiscounts(beers);
 
         storage = new BeerDiscountsStorage(appContext);
-        assertEquals(1,storage.getBeerDiscounts().size());
-        assertEquals("beer1",storage.getBeerDiscounts().get(0).beer.name);
 
-        storage.setBeerDiscounts(new ArrayList<>());
+        assertEquals(10, storage.getBeerDiscount("beer1").floatValue(), 0.001);
+
+        storage.clear();
     }
 
 

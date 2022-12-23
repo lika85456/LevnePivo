@@ -20,6 +20,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+/**
+ * Notifies user when new discounts are available. Starts every day at 15 (+-)
+ */
 public class NotificationsBroadcastReceiver extends BroadcastReceiver {
 
     public static final String CHANNEL_ID = "levnepivo_channel";
@@ -35,11 +38,11 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
             calendar.setTimeInMillis(System.currentTimeMillis());
             calendar.set(Calendar.HOUR_OF_DAY, 15);
 
-            AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
             PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, new Intent(context, NotificationsBroadcastReceiver.class), PendingIntent.FLAG_IMMUTABLE);
 
-            alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+            alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                     AlarmManager.INTERVAL_DAY, alarmIntent);
             Log.d("NotificationsBroadcast", "Alarm set");
         }
@@ -50,7 +53,7 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
             try {
                 ArrayList<BeerAPI.BeerDiscount> result = BeerAPI.fetchDiscounts();
 
-                String text = NewBeerDiscountsService.getNewDiscountsNotificationText(beerDiscountsStorage.getBeerDiscounts(), result, lovedBeersStorage.getLovedBeers());
+                String text = NewBeerDiscountsService.getNewDiscountsNotificationText(beerDiscountsStorage, result, lovedBeersStorage.getLovedBeers());
 
                 // save new discounts
                 for (int i = 0; i < result.size(); i++) {
@@ -60,6 +63,11 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
                     }
                 }
 
+                if(text==null) {
+                    return;
+                }
+
+                // save new discounts
                 beerDiscountsStorage.setBeerDiscounts(result);
 
                 // send notification

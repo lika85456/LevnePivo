@@ -12,7 +12,8 @@ import java.io.InputStream;
  * loads image from url and sets it to image view
  */
 public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-    ImageView bmImage;
+    final ImageView bmImage;
+    @SuppressWarnings("deprecation")
     public DownloadImageTask(ImageView bmImage) {
         this.bmImage = bmImage;
     }

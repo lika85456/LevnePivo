@@ -9,60 +9,39 @@ import java.util.ArrayList;
 
 public class NewBeerDiscountsService {
     /**
-     * Will notify if new loved beer discounts are available
-     * @param oldDiscounts
+     * Returns text for notification when new beers are loaded
+     * @param beerDiscountsStorage
      * @param newDiscounts
      * @param lovedBeers names of loved beers
+     * @returns null if no new discounts are available
      */
-    public static String getNewDiscountsNotificationText(ArrayList<BeerAPI.BeerDiscount> oldDiscounts, ArrayList<BeerAPI.BeerDiscount> newDiscounts, ArrayList<String> lovedBeers) {
-        // remove non loved beers from new discounts
-        for (int i = 0; i < newDiscounts.size(); i++) {
-            if (!lovedBeers.contains(newDiscounts.get(i).beer.name)) {
-                newDiscounts.remove(i);
-                i--;
-            }
-        }
-
-        // remove non loved beers from old discounts
-        for (int i = 0; i < oldDiscounts.size(); i++) {
-            if (!lovedBeers.contains(oldDiscounts.get(i).beer.name)) {
-                oldDiscounts.remove(i);
-                i--;
-            }
-        }
-
+    public static String getNewDiscountsNotificationText(BeerDiscountsStorage beerDiscountsStorage, ArrayList<BeerAPI.BeerDiscount> newDiscounts, ArrayList<String> lovedBeers) {
         String notificationText = "";
 
-        for (String beer : lovedBeers) {
-            // get new discount
-            BeerAPI.BeerDiscount newDiscount = null;
-            for (BeerAPI.BeerDiscount discount : newDiscounts) {
-                if (discount.beer.name.equals(beer)) {
-                    newDiscount = discount;
-                    break;
-                }
+        for (String lovedBeer : lovedBeers) {
+            Float oldPrice = beerDiscountsStorage.getBeerDiscount(lovedBeer);
+
+            Float newPrice = null;
+            BeerAPI.BeerDiscount newDiscount = getBeerDiscountByBeerName(newDiscounts, lovedBeer);
+            if (newDiscount != null) {
+                newPrice = newDiscount.discounts.get(0).pricePerVolume.price;
             }
 
-            // get old discount
-            BeerAPI.BeerDiscount oldDiscount = null;
-            for (BeerAPI.BeerDiscount discount : oldDiscounts) {
-                if (discount.beer.name.equals(beer)) {
-                    oldDiscount = discount;
-                    break;
-                }
+            if(newPrice != null && (!oldPrice.equals(newPrice))) {
+                notificationText += lovedBeer + " - " + newPrice + ",- Kč\n";
             }
-
-            if (newDiscount != null && (oldDiscount == null || newDiscount.discounts.get(0).pricePerVolume.price != oldDiscount.discounts.get(0).pricePerVolume.price)) {
-                notificationText += beer + " - " + newDiscount.discounts.get(0).pricePerVolume.price + ",- Kč\n";
-            }
-        }
-
-        if (notificationText.equals("")) {
-            return null;
         }
 
         return notificationText;
+    }
 
+    private static BeerAPI.BeerDiscount getBeerDiscountByBeerName(ArrayList<BeerAPI.BeerDiscount> beerDiscounts, String beerName){
+        for(BeerAPI.BeerDiscount beerDiscount : beerDiscounts){
+            if(beerDiscount.beer.name.equals(beerName)){
+                return beerDiscount;
+            }
+        }
+        return null;
     }
 
 }

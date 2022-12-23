@@ -25,6 +25,7 @@ public class LovedBeersStorageTest {
     public void itSavesAndLoadsProperly() {
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         LovedBeersStorage storage = new LovedBeersStorage(appContext);
+        storage.clear();
         storage.add("beer1");
 
         storage = new LovedBeersStorage(appContext);
@@ -42,6 +43,8 @@ public class LovedBeersStorageTest {
     public void itDoesNotAddSameBeerTwice() {
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         LovedBeersStorage storage = new LovedBeersStorage(appContext);
+        storage.clear();
+
         storage.add("beer1");
         storage.add("beer1");
 
@@ -56,6 +59,7 @@ public class LovedBeersStorageTest {
     public void itCallsOnChangeListener(){
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         LovedBeersStorage storage = new LovedBeersStorage(appContext);
+        storage.clear();
 
         LovedBeersStorage.OnChangeListener listener = new LovedBeersStorage.OnChangeListener() {
             @Override

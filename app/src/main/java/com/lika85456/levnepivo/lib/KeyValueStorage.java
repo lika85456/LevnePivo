@@ -11,7 +11,7 @@ import android.content.SharedPreferences;
  *
  */
 public class KeyValueStorage {
-    protected SharedPreferences preferences;
+    protected final SharedPreferences preferences;
 
     public KeyValueStorage(Context context, String name){
         preferences = context.getSharedPreferences(name, Context.MODE_PRIVATE);

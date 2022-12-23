@@ -18,17 +18,17 @@ import com.lika85456.levnepivo.lib.BeerAPI;
 import com.lika85456.levnepivo.lib.DownloadImageTask;
 
 public class BeerCard extends FrameLayout {
-    private BeerAPI.BeerDiscount discount;
+    private final BeerAPI.BeerDiscount discount;
 
-    private TextView titleTextView;
-    private TextView priceTextView;
-    private ImageView beerImageView;
-    private ImageView bestProviderImageView;
+    private final TextView titleTextView;
+    private final TextView priceTextView;
+    private final ImageView beerImageView;
+    private final ImageView bestProviderImageView;
 
-    private LinearLayout providersLayout;
+    private final LinearLayout providersLayout;
     private boolean isExpanded = false;
 
-    private ImageView heartIcon;
+    private final ImageView heartIcon;
     private boolean isFavourite = false;
 
     public BeerCard(Context context, BeerAPI.BeerDiscount discount, boolean isFavourite, OnClickListener onFavouriteClickListener) {

@@ -5,8 +5,8 @@ import android.content.Context;
 import java.util.ArrayList;
 
 public class LovedBeersStorage {
-    private KeyValueStorage storage;
-    private ArrayList<String> lovedBeers;
+    private final KeyValueStorage storage;
+    private final ArrayList<String> lovedBeers;
     // on change listener
     private OnChangeListener onChangeListener;
 
@@ -37,7 +37,6 @@ public class LovedBeersStorage {
         lovedBeers.add(beerName);
         save();
 
-        // call listener
         if(onChangeListener != null){
             onChangeListener.onChange(getLovedBeers());
         }
@@ -47,7 +46,6 @@ public class LovedBeersStorage {
         lovedBeers.remove(beerName);
         save();
 
-        // call listener
         if(onChangeListener != null){
             onChangeListener.onChange(getLovedBeers());
         }
@@ -65,6 +63,11 @@ public class LovedBeersStorage {
 
     public void setOnChangeListener(OnChangeListener onChangeListener){
         this.onChangeListener = onChangeListener;
+    }
+
+    public void clear() {
+        lovedBeers.clear();
+        save();
     }
 
     public interface OnChangeListener {

@@ -3,37 +3,24 @@ package com.lika85456.levnepivo;
 import static com.lika85456.levnepivo.NotificationsBroadcastReceiver.CHANNEL_ID;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.app.AlarmManager;
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.ScrollView;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.lika85456.levnepivo.components.BeerCard;
 import com.lika85456.levnepivo.lib.BeerAPI;
 import com.lika85456.levnepivo.lib.BeerDiscountsStorage;
 import com.lika85456.levnepivo.lib.LovedBeersStorage;
-import com.lika85456.levnepivo.services.NewBeerDiscountsService;
 
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
             createNotificationChannel();
         }
         catch(Exception e){
-            Log.d("MainActivity", "Error: " + e.getMessage());
+            Log.d("MainActivity", "Creating notification channel failed. Error: " + e.getMessage());
         }
         lovedBeersStorage = new LovedBeersStorage(this);
 
@@ -57,11 +44,6 @@ public class MainActivity extends AppCompatActivity {
         setTitle("Seznam slev na pivo!");
 
         loadBeers();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 
     private void createNotificationChannel() {
@@ -97,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
 
-                    changeOrder();
+                    updateBeerOrder();
                 }
             });
             cards.add(beerCard);
@@ -106,6 +88,13 @@ public class MainActivity extends AppCompatActivity {
         return cards;
     }
 
+    /**
+     * Sort the beer cards so that the loved beers are on top.
+     * It doesn't sort alphabetically.
+     * @param beerCards
+     * @param lovedBeers
+     * @return
+     */
     private ArrayList<BeerCard> sortWithLovedBeers(ArrayList<BeerCard> beerCards, ArrayList<String> lovedBeers){
         ArrayList<BeerCard> sortedCards = new ArrayList<>();
 
@@ -128,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
         return sortedCards;
     }
 
-    private void changeOrder(){
+    private void updateBeerOrder(){
         ArrayList<BeerCard> sortedCards = sortWithLovedBeers(getCards(), lovedBeersStorage.getLovedBeers());
 
         beersLayout.removeAllViews();
@@ -169,6 +158,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Returns card instances in beer list
+     * @return
+     */
     private ArrayList<BeerCard> getCards(){
         ArrayList<BeerCard> beerCards = new ArrayList<>();
         for(int j = 0; j < beersLayout.getChildCount(); j++){
@@ -203,18 +196,19 @@ public class MainActivity extends AppCompatActivity {
 
         initializeSearch();
         initializeScrollRefresh();
-
-        BeerDiscountsStorage beerDiscountsStorage = new BeerDiscountsStorage(this);
-
     }
 
-    private void onBeerLoadFailed(Exception exception){
+    /**
+     * Loads error layout with the ability to reload beers.
+     */
+    private void onBeerLoadFailed(){
         setContentView(R.layout.error);
 
         // set listener to reload
         findViewById(R.id.reloadButton).setOnClickListener(v -> loadBeers());
 
         // TODO Log error to google analytics?
+        Log.e("MainActivity", "Loading beers failed.");
     }
 
     private void loadBeers(){

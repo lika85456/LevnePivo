@@ -16,8 +16,8 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Klikem na kartičku zobrazíš další slevy"
-            android:textColor="@color/black"
+            android:text="Klikem na kartičku se zobrazí další slevy"
+            android:textColor="?android:textColorPrimary"
             />
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/outlined_text_input_layout"

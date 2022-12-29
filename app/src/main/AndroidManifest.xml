@@ -26,7 +26,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".NotificationsBroadcastReceiver"
+        <receiver android:name=".services.NotificationsBroadcastReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>

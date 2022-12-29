@@ -40,6 +40,7 @@
                 <map>
                   <entry key="Duration" value="90" />
                   <entry key="OnePlus&#10; KB2003" value="120" />
+                  <entry key="Resizable_API_33" value="120" />
                   <entry key="Resizable_Experimental_API_33" value="120" />
                   <entry key="Tests" value="360" />
                   <entry key="adb-6fe6ee74-afX0sH._adb-tls-connect._tcp" value="120" />

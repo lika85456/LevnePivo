@@ -4,36 +4,36 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 /**
- * Simple key value storage for strings.
+ * Simple persistent key value storage for strings. Needs name identifier.
  *
- * @example From an activity
+ * <pre>
  * KeyValueStorage storage = new KeyValueStorage(this, "my_storage");
- *
+ * </pre>
  */
 public class KeyValueStorage {
     protected final SharedPreferences preferences;
 
-    public KeyValueStorage(Context context, String name){
+    public KeyValueStorage(Context context, String name) {
         preferences = context.getSharedPreferences(name, Context.MODE_PRIVATE);
     }
 
-    public void set(String key, String value){
+    public void set(String key, String value) {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(key, value);
         editor.apply();
     }
 
-    public String get(String key, String defaultValue){
+    public String get(String key, String defaultValue) {
         return preferences.getString(key, defaultValue);
     }
 
-    public void remove(String key){
+    public void remove(String key) {
         SharedPreferences.Editor editor = preferences.edit();
         editor.remove(key);
         editor.apply();
     }
 
-    public void clear(){
+    public void clear() {
         SharedPreferences.Editor editor = preferences.edit();
         editor.clear();
         editor.apply();

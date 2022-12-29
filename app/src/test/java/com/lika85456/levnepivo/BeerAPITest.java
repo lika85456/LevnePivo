@@ -18,10 +18,10 @@ public class BeerAPITest {
     private final static Pattern IMG_URL = Pattern.compile(".*?(gif|jpeg|png|jpg|bmp)");
 
     /**
-     * This test may fail, if Kupi changes it's DOM structure, or if internet is not available. It's not really a great test, but hey.
+     * This test may fail, if Kupi changes it's DOM structure, or if internet is not available.
      */
     @Test
-    public void itFetchesSensibleData() throws IOException, NullPointerException {
+    public void itFetchesReasonableData() throws IOException, NullPointerException {
             ArrayList<BeerAPI.BeerDiscount> discounts = BeerAPI.fetchDiscounts();
             assert(discounts.size() > 0);
             for(BeerAPI.BeerDiscount discount : discounts){
@@ -35,7 +35,7 @@ public class BeerAPITest {
                 // check all beers have discounts
                 assert(discount.discounts.size()>0);
 
-                // check all discounts are sensible
+                // check all discounts are reasonable
                 for(BeerAPI.BeerProviderDiscount providerDiscount : discount.discounts){
                     // provider name
                     assert(providerDiscount.providerName.length()>0);

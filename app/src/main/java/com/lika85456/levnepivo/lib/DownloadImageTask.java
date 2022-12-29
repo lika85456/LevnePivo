@@ -9,10 +9,11 @@ import android.widget.ImageView;
 import java.io.InputStream;
 
 /**
- * loads image from url and sets it to image view
+ * loads image from url and displays it on an image view
  */
 public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     final ImageView bmImage;
+
     @SuppressWarnings("deprecation")
     public DownloadImageTask(ImageView bmImage) {
         this.bmImage = bmImage;
@@ -31,6 +32,7 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         }
         return bitmap;
     }
+
     protected void onPostExecute(Bitmap result) {
         bmImage.setImageBitmap(result);
     }

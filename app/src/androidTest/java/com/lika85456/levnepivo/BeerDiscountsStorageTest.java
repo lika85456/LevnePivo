@@ -46,7 +46,7 @@ public class BeerDiscountsStorageTest {
 
         storage = new BeerDiscountsStorage(appContext);
 
-        assertEquals(10, storage.getBeerDiscount("beer1").floatValue(), 0.001);
+        assertEquals(10, storage.getBeerDiscount("beer1"), 0.001);
 
         storage.clear();
     }
